@@ -8,6 +8,7 @@ public:
     explicit Matrix(int size);
     Matrix(int rows, int cols);
     Matrix(const Matrix& other);
+    Matrix& operator=(const Matrix& other);
     ~Matrix();
 
     int get(int i, int j) const;

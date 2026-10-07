@@ -55,6 +55,43 @@ Matrix::Matrix(const Matrix& other)
     }
 }
 
+Matrix& Matrix::operator=(const Matrix& other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    // Освободить старую память
+    if (data_ != nullptr) {
+        for (int i = 0; i < rows_; ++i) {
+            delete[] data_[i];
+        }
+        delete[] data_;
+        data_ = nullptr;
+    }
+
+    // Скопировать размеры
+    rows_ = other.rows_;
+    cols_ = other.cols_;
+
+    // Если источник пустой — обнулить и выйти
+    if (rows_ == 0 || cols_ == 0) {
+        rows_ = 0;
+        cols_ = 0;
+        return *this;
+    }
+
+    // Выделить новую память и скопировать данные
+    data_ = new int*[rows_];
+    for (int i = 0; i < rows_; ++i) {
+        data_[i] = new int[cols_];
+        for (int j = 0; j < cols_; ++j) {
+            data_[i][j] = other.data_[i][j];
+        }
+    }
+
+    return *this;
+}
+
 Matrix::~Matrix() {
     if (data_ == nullptr) {
         return;
