@@ -23,6 +23,10 @@ public:
     int getCols() const;
 
 private:
+    void allocate(int rows, int cols);
+    void copyFrom(const Matrix& other);
+    void freeMemory();
+
     int** data_;
     int rows_;
     int cols_;

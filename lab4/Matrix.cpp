@@ -3,64 +3,30 @@
 #include <iostream>
 #include <cstdlib>
 
-Matrix::Matrix()
-    : data_(nullptr), rows_(0), cols_(0) {
+
+void Matrix::allocate(int rows, int cols) {
+    data_ = new int*[rows];
+    for (int i = 0; i < rows; ++i) {
+        data_[i] = new int[cols];
+    }
+    rows_ = rows;
+    cols_ = cols;
 }
 
-Matrix::Matrix(int size)
-    : data_(nullptr), rows_(size), cols_(size) {
-    if (size < 0) {
-        throw std::invalid_argument("Размерность не может быть отрицательной");
-    }
-    if (size == 0) {
+void Matrix::copyFrom(const Matrix& other) {
+    if (other.rows_ == 0 || other.cols_ == 0 || other.data_ == nullptr) {
         return;
     }
 
-    data_ = new int*[rows_];
+    allocate(other.rows_, other.cols_);
     for (int i = 0; i < rows_; ++i) {
-        data_[i] = new int[cols_]();
-        data_[i][i] = 1;
-    }
-}
-
-Matrix::Matrix(int rows, int cols)
-    : data_(nullptr), rows_(rows), cols_(cols) {
-    if (rows < 0 || cols < 0) {
-        throw std::invalid_argument("Размерность не может быть отрицательной");
-    }
-    if (rows == 0 || cols == 0) {
-        return;
-    }
-
-    data_ = new int*[rows_];
-    for (int i = 0; i < rows_; ++i) {
-        data_[i] = new int[cols_]();
-    }
-}
-
-Matrix::Matrix(const Matrix& other)
-    : data_(nullptr), rows_(other.rows_), cols_(other.cols_) {
-    if (rows_ == 0 || cols_ == 0) {
-        rows_ = 0;
-        cols_ = 0;
-        return;
-    }
-
-    data_ = new int*[rows_];
-    for (int i = 0; i < rows_; ++i) {
-        data_[i] = new int[cols_];
         for (int j = 0; j < cols_; ++j) {
             data_[i][j] = other.data_[i][j];
         }
     }
 }
 
-Matrix& Matrix::operator=(const Matrix& other) {
-    if (this == &other) {
-        return *this;
-    }
-
-    // Освободить старую память
+void Matrix::freeMemory() {
     if (data_ != nullptr) {
         for (int i = 0; i < rows_; ++i) {
             delete[] data_[i];
@@ -68,39 +34,72 @@ Matrix& Matrix::operator=(const Matrix& other) {
         delete[] data_;
         data_ = nullptr;
     }
+    rows_ = 0;
+    cols_ = 0;
+}
 
-    // Скопировать размеры
-    rows_ = other.rows_;
-    cols_ = other.cols_;
 
-    // Если источник пустой — обнулить и выйти
-    if (rows_ == 0 || cols_ == 0) {
-        rows_ = 0;
-        cols_ = 0;
-        return *this;
+Matrix::Matrix()
+    : data_(nullptr), rows_(0), cols_(0) {
+}
+
+Matrix::Matrix(int size)
+    : data_(nullptr), rows_(0), cols_(0) {
+    if (size < 0) {
+        throw std::invalid_argument("Размерность не может быть отрицательной");
+    }
+    if (size == 0) {
+        return;
     }
 
-    // Выделить новую память и скопировать данные
-    data_ = new int*[rows_];
+    allocate(size, size);
+
     for (int i = 0; i < rows_; ++i) {
-        data_[i] = new int[cols_];
         for (int j = 0; j < cols_; ++j) {
-            data_[i][j] = other.data_[i][j];
+            data_[i][j] = 0;
         }
     }
+    for (int i = 0; i < rows_; ++i) {
+        data_[i][i] = 1;
+    }
+}
 
+Matrix::Matrix(int rows, int cols)
+    : data_(nullptr), rows_(0), cols_(0) {
+    if (rows < 0 || cols < 0) {
+        throw std::invalid_argument("Размерность не может быть отрицательной");
+    }
+    if (rows == 0 || cols == 0) {
+        return;
+    }
+
+    allocate(rows, cols);
+
+    for (int i = 0; i < rows_; ++i) {
+        for (int j = 0; j < cols_; ++j) {
+            data_[i][j] = 0;
+        }
+    }
+}
+
+Matrix::Matrix(const Matrix& other)
+    : data_(nullptr), rows_(0), cols_(0) {
+    copyFrom(other);
+}
+
+Matrix& Matrix::operator=(const Matrix& other) {
+    if (this == &other) {
+        return *this;
+    }
+    freeMemory();
+    copyFrom(other);
     return *this;
 }
 
 Matrix::~Matrix() {
-    if (data_ == nullptr) {
-        return;
-    }
-    for (int i = 0; i < rows_; ++i) {
-        delete[] data_[i];
-    }
-    delete[] data_;
+    freeMemory();
 }
+
 
 int Matrix::get(int i, int j) const {
     if (i < 0 || i >= rows_ || j < 0 || j >= cols_) {
@@ -115,6 +114,7 @@ void Matrix::set(int i, int j, int value) {
     }
     data_[i][j] = value;
 }
+
 
 void Matrix::inputFromKeyboard() {
     for (int i = 0; i < rows_; ++i) {

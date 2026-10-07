@@ -5,6 +5,7 @@
 #include <ctime>
 
 int main() {
+    setlocale(LC_ALL,"ru_RU.UTF-8");
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     Matrix a(3, 4);
