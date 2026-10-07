@@ -9,6 +9,10 @@ Matrix::Matrix()
 
 Matrix::Matrix(int size)
     : data_(nullptr), rows_(size), cols_(size) {
+    if (size < 0) {
+        throw std::invalid_argument("Размерность не может быть отрицательной");
+    }
+
     if (size == 0) {
         return;
     }
@@ -22,6 +26,10 @@ Matrix::Matrix(int size)
 
 Matrix::Matrix(int rows, int cols)
     : data_(nullptr), rows_(rows), cols_(cols) {
+    if (rows < 0 || cols < 0) {
+        throw std::invalid_argument("Размерность не может быть отрицательной");
+    }
+
     if (rows == 0 || cols == 0) {
         return;
     }
@@ -44,10 +52,16 @@ Matrix::~Matrix() {
 }
 
 int Matrix::get(int i, int j) const {
+    if (i < 0 || i >= rows_ || j < 0 || j >= cols_) {
+        throw std::out_of_range("Индекс вне диапазона");
+    }
     return data_[i][j];
 }
 
 void Matrix::set(int i, int j, int value) {
+    if (i < 0 || i >= rows_ || j < 0 || j >= cols_) {
+        throw std::out_of_range("Индекс вне диапазона");
+    }
     data_[i][j] = value;
 }
 

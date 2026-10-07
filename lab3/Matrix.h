@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 class Matrix {
 public:
     Matrix();
